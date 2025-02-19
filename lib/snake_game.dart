@@ -1,26 +1,32 @@
-import 'package:flutter/material.dart';
-import 'dart:async';
-import 'dart:math';
+import 'package:flutter/material.dart'; //Importa la biblioteca principal de Flutter, que proporciona los widgets esenciales para construir la interfaz gráfica.
+import 'dart:async'; //Importa la biblioteca de utilidades necesaria para usar Timer, que controla la actualización del juego.
+import 'dart:math'; //Importa la biblioteca matemática, usada para generar números aleatorios (posición de la comida de la serpiente).
 
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
+  //MyApp es el widget principal de la app. Extiende StatelessWidget, su estado no cambia después de la construcción.
   const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false, // Oculta la barra de depuración
-      home: HomePage(),
+      home:
+          HomePage(), //home: HomePage() establece HomePage como la pantalla inicial.
     );
   }
 }
 
 class HomePage extends StatefulWidget {
+  //HomePage es un StatefulWidget, significa que su estado puede cambiar.
   @override
-  _HomePageState createState() => _HomePageState();
+  _HomePageState createState() =>
+      _HomePageState(); //createState() crea una instancia de _HomePageState, que maneja la lógica del juego.
 }
 
 class _HomePageState extends State<HomePage> {
+  //Contiene la lógica del juego, incluyendo el movimiento de la serpiente y la detección de colisiones.
+
   static List<int> snakePosition = [
     45,
     65,
@@ -44,25 +50,33 @@ class _HomePageState extends State<HomePage> {
 
   // Método para iniciar el juego
   void startGame() {
-    snakePosition = [45, 65, 85, 105, 125]; // Reinicia la serpiente
-    const duration =
-        const Duration(milliseconds: 100); // Velocidad de actualización
+    snakePosition = [
+      45,
+      65,
+      85,
+      105,
+      125
+    ]; // Reinicia la posición de la serpiente
+    const duration = const Duration(
+        milliseconds:
+            75); // Velocidad de actualización (velocidad de la serpiente)
     Timer.periodic(duration, (Timer timer) {
       updateSnake(); // Actualiza la posición de la serpiente
       if (gameOver()) {
+        //Si hay colisión, se cancela el temporizador y se muestra la pantalla de "Game Over".
         timer.cancel(); // Detiene el juego si hay colisión
         _showGameOverScreen();
       }
     });
   }
 
-  var direction = 'down'; // Dirección inicial de la serpiente
+  var direction = 'down'; // Dirección inicial de la serpiente (hacia abajo)
 
   // Método para actualizar la posición de la serpiente
   void updateSnake() {
     setState(() {
       switch (direction) {
-        case 'down':
+        case 'down': //si la serpiente sale de la pantalla hacia abajo, reaparece en la parte de arriba
           if (snakePosition.last > 740) {
             snakePosition
                 .add(snakePosition.last + 20 - 760); // Teletransporta arriba
@@ -70,7 +84,7 @@ class _HomePageState extends State<HomePage> {
             snakePosition.add(snakePosition.last + 20);
           }
           break;
-        case 'up':
+        case 'up': //si la serpiente sale de la pantalla hacia arriba, reaparece en la parte de abajo
           if (snakePosition.last < 20) {
             snakePosition
                 .add(snakePosition.last - 20 + 760); // Teletransporta abajo
@@ -78,7 +92,7 @@ class _HomePageState extends State<HomePage> {
             snakePosition.add(snakePosition.last - 20);
           }
           break;
-        case 'left':
+        case 'left': //si la serpiente sale de la pantalla hacia la izquierda, reaparece en la derecha
           if (snakePosition.last % 20 == 0) {
             snakePosition.add(
                 snakePosition.last - 1 + 20); // Teletransporta a la derecha
@@ -86,7 +100,7 @@ class _HomePageState extends State<HomePage> {
             snakePosition.add(snakePosition.last - 1);
           }
           break;
-        case 'right':
+        case 'right': //si la serpiente sale de la pantalla hacia la derecha, reaparece en la parte izquierda
           if ((snakePosition.last + 1) % 20 == 0) {
             snakePosition.add(
                 snakePosition.last + 1 - 20); // Teletransporta a la izquierda
@@ -96,11 +110,11 @@ class _HomePageState extends State<HomePage> {
           break;
       }
 
-      // Verifica si la serpiente ha comido
+      // Si la serpiente coincide con la comida se genera una comida nueva
       if (snakePosition.last == food) {
         generateNewFood();
       } else {
-        snakePosition.removeAt(0); // Movimiento normal de la serpiente
+        snakePosition.removeAt(0); // si no, se acorta la cola
       }
     });
   }
@@ -128,10 +142,10 @@ class _HomePageState extends State<HomePage> {
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text('GAME OVER'),
-            content: Text('Your score: ' + snakePosition.length.toString()),
+            content: Text('Tu puntuación: ' + snakePosition.length.toString()),
             actions: <Widget>[
               TextButton(
-                child: Text('Play Again'),
+                child: Text('Jugar de nuevo'),
                 onPressed: () {
                   startGame(); // Reinicia el juego
                   Navigator.of(context).pop();
@@ -150,6 +164,7 @@ class _HomePageState extends State<HomePage> {
         children: <Widget>[
           Expanded(
             child: GestureDetector(
+              //GestureDetector detecta deslizamientos y cambia la dirección de la serpiente.
               onVerticalDragUpdate: (details) {
                 if (direction != 'up' && details.delta.dy > 0) {
                   direction = 'down';
@@ -166,32 +181,42 @@ class _HomePageState extends State<HomePage> {
               },
               child: Container(
                 child: GridView.builder(
-                    physics: NeverScrollableScrollPhysics(),
+                    //Se usa GridView.builder para dibujar la cuadrícula.
+                    physics:
+                        NeverScrollableScrollPhysics(), //physics: NeverScrollableScrollPhysics() evita que la cuadrícula sea desplazable.
                     itemCount: numberOfSquares,
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 20),
+                        crossAxisCount:
+                            20), //crossAxisCount: 20 establece que la cuadrícula tenga 20 columnas.
                     itemBuilder: (BuildContext context, int index) {
                       if (snakePosition.contains(index)) {
+                        //Si el índice index está en snakePosition, significa que la celda es parte de la serpiente.
                         return Center(
                           child: Container(
-                            padding: EdgeInsets.all(2),
+                            padding: EdgeInsets.all(
+                                2), //Relleno interno de dos pixeles a la serpiente
                             child: ClipRRect(
-                              borderRadius: BorderRadius.circular(5),
+                              borderRadius: BorderRadius.circular(
+                                  5), //Se dibuja un cuadrado blanco (color: Colors.white) con bordes redondeados (borderRadius).
                               child: Container(color: Colors.white),
                             ),
                           ),
                         );
                       }
                       if (index == food) {
+                        //Si index coincide con la posición de la comida, se dibuja un cuadrado verde (color: Colors.green).
                         return Container(
-                          padding: EdgeInsets.all(2),
+                          padding: EdgeInsets.all(
+                              2), //Relleno interno de dos pixeles a la comida
                           child: ClipRRect(
                               borderRadius: BorderRadius.circular(5),
                               child: Container(color: Colors.green)),
                         );
                       } else {
+                        //Si index no es la serpiente ni la comida, se dibuja un cuadrado gris oscuro (color: Colors.grey[900]), representando el fondo de la cuadrícula.
                         return Container(
-                          padding: EdgeInsets.all(2),
+                          padding: EdgeInsets.all(
+                              2), // Relleno interno de dos pixeles a la cuadricula de fondo
                           child: ClipRRect(
                               borderRadius: BorderRadius.circular(5),
                               child: Container(color: Colors.grey[900])),
@@ -202,27 +227,32 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           Padding(
+            //Se usa Padding para agregar espacio en la parte inferior y los lados.
             padding:
                 const EdgeInsets.only(bottom: 20.0, left: 20.0, right: 20.0),
             child: Row(
+              //Row organiza los elementos horizontalmente.
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 GestureDetector(
-                  onTap: startGame,
+                  //GestureDetector permite que el texto "s t a r t" actúe como botón de inicio del juego.
+                  onTap:
+                      startGame, //onTap: startGame inicia el juego cuando se toca el texto.
                   child: Text(
                     's t a r t',
                     style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
                 ),
                 Text(
-                  'F o r  M a j o',
+                  //Texto con las iniciales del autor del juego
+                  '@ E K R L',
                   style: TextStyle(color: Colors.white, fontSize: 20),
-                )
-              ],
-            ),
-          )
-        ],
-      ),
-    );
+                ) //Text
+              ], //<Widget>
+            ), //Row
+          ) //Padding
+        ], //<Widget>
+      ), //Column
+    ); //Scaffold
   }
 }
