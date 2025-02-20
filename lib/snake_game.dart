@@ -34,7 +34,7 @@ class _HomePageState extends State<HomePage> {
     105,
     125
   ]; // Posiciones iniciales de la serpiente
-  int numberOfSquares = 760; // Número total de celdas en la cuadrícula
+  int numberOfSquares = 760; // Número total de celdas en la cuadrícula (20x38)
 
   static var randomNumber = Random();
   int food = randomNumber.nextInt(700); // Posición inicial de la comida
@@ -59,7 +59,7 @@ class _HomePageState extends State<HomePage> {
     ]; // Reinicia la posición de la serpiente
     const duration = const Duration(
         milliseconds:
-            75); // Velocidad de actualización (velocidad de la serpiente)
+            200); // Velocidad de actualización (velocidad de la serpiente)
     Timer.periodic(duration, (Timer timer) {
       updateSnake(); // Actualiza la posición de la serpiente
       if (gameOver()) {
@@ -142,7 +142,7 @@ class _HomePageState extends State<HomePage> {
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text('GAME OVER'),
-            content: Text('Tu puntuación: ' + snakePosition.length.toString()),
+            content: Text('Tu puntuación:   ${snakePosition.length - 5}'),
             actions: <Widget>[
               TextButton(
                 child: Text('Jugar de nuevo'),
